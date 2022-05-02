@@ -209,7 +209,7 @@ public:
           //It is ok not to reset m_and_op because all its member variables can be overriden just fine.
           
           //Now trying to get a new client.
-          *theClient = server[ port_i ].available(); //please note that this actually sets *theClient to return false (or maybe null) when tested later in an "if" e.g.          
+          *theClient = server[ port_i ].available(); //please note that this actually sets *theClient to return false (or maybe null) when tested later in an "if" e.g.
           if( *theClient ) {
             if( theClient->connected() ) {
               //theClientObj->just_connected = true;

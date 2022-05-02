@@ -10,7 +10,7 @@ const char* host = "www.diraniyoussef.ddns.net";
 void setup()
 {
   Serial.begin(115200);
-  Serial.setDebugOutput(true);
+  Serial.setDebugOutput(true); //to redirect to Serial1 I guess
 
   Serial.println();
 
@@ -72,5 +72,3 @@ void loop()
   delay(5000);
   */
 }
-
-

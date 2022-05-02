@@ -3,16 +3,16 @@
   
 void setup() {
   // Setting The Serial Port ----------------------------------------------
-  Serial.begin(115200);
-  Serial.println();
+  //Serial.begin(115200);
+  //Serial.println();
 
   // Setting Up A Wifi Access Point
-  SetWifi();  
+  SetWifi();
 }
 
 void loop() {
   int connectedStations = WiFi.softAPgetStationNum();
-  Serial.printf("Stations connected = %d\n", connectedStations);
+  //Serial.printf("Stations connected = %d\n", connectedStations);
   const int out_pin = 0; //to control the LED we use pin 2 which turns on when set LOW and turns off when HIGH
   pinMode(out_pin, OUTPUT);
   if( connectedStations > 0 ){
@@ -31,7 +31,7 @@ void SetWifi(){
 
   // Setting the WiFi mode
   WiFi.mode(WIFI_AP);
-  Serial.println("WIFI Mode : AccessPoint");
+  //Serial.println("WIFI Mode : AccessPoint");
   
   char* ssid = "zaher_house_gate";
   char* pass = "ydrs99sn"; //can be empty string 
@@ -41,20 +41,21 @@ void SetWifi(){
   IPAddress subnet(255, 255, 255, 0);
 
   if (WiFi.softAPConfig(local_IP, gateway, subnet)){
-    Serial.print("Setting soft-AP ... ");      
+  //  Serial.print("Setting soft-AP ... ");      
     if( WiFi.softAP( ssid, pass ) ) //WiFi.softAP(ssid, password, 1 ,0, MAXSC); // WiFi.softAP(ssid, password, channel, hidden, max_connection)
     {
-      Serial.println("WIFI < " + String(ssid) + " > ... Started");
-      Serial.println("Ready"); //as a server, it's probably better to let the client close the connection after that he is satisfied.
-      Serial.print("Soft-AP IP address = ");
-      Serial.println(WiFi.softAPIP());
+      digitalWrite(2, LOW); //turning the LED on if the AP is correctly configured
+  //    Serial.println("WIFI < " + String(ssid) + " > ... Started");
+  //    Serial.println("Ready"); //as a server, it's probably better to let the client close the connection after that he is satisfied.
+  //    Serial.print("Soft-AP IP address = ");
+  //    Serial.println(WiFi.softAPIP());
       //WiFi.softAPdisconnect(wifioff);
     }
     else
     {
-      Serial.println("Failed! Couldn't establish an AP");
+  //    Serial.println("Failed! Couldn't establish an AP");
     }  
   } else {
-    Serial.println("Failed! Couldn't configure an AP");
+  //  Serial.println("Failed! Couldn't configure an AP");
   }  
 }
