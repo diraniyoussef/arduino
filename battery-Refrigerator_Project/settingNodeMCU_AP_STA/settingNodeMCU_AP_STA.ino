@@ -1,8 +1,14 @@
-#include "Setup.h"
+#include "Main.h"
 
 const int delay_per_loop = 750;
 boolean main_oper_vars_need_to_be_reset = true; /*Necessary. This won't be taken into effect unless NodeMCU connects to router*/
 AP_Op AP_op;
+boolean first_time_switchToAPMode_lock = false;
+
+void setupMainVars() {
+  //setting up main operations variables
+
+}
 
 void stopMainOperationsAndDisconnect() {/*this involves stopping and resetting the needed things to normal in case we returned back to normal operation*/
 	//local_server.stopOperations();
@@ -56,49 +62,19 @@ void loop() {
           main_oper_vars_need_to_be_reset = false;
           setupMainVars();
         }
-        toggle_connect_failure_notifier_pin = false; /*I have to set it at the beginning of each loop. This variable may be changed in 
-                                                      * class AsynchroClient and class InformEntity
-                                                       */        
-      //  PCF1.pcf8574A.getByte(); //this is to evaluate the method "isDataRead()" //comment for PCF exclusion
-      //  if(! PCF1.pcf8574A.isDataRead() ) { //comment for PCF exclusion
-          //Serial.println("PCF is not properly connected to Node MCU");
-          /*BTW later, make a special blinking for the connectFailureNotifierPin in case of an internal damage causing the PCF to be disconnected.*/
-      //  } else { //comment for PCF exclusion
-      //    NodeMCU::checkManualUpdate();    
-      //    PCF1.checkManualUpdate();    //comment for PCF exclusion
+        toggle_connect_failure_notifier_pin = false; /*I have to set it at the beginning of each loop. This variable may be changed in Main*/        
+				
+				//doing all the work you want here below
 
-          NodeMCU::checkIfInPinsChanged(); //this has to be before inform_local and inform_remote processing
-          
-          //informing registered local servers
-          inform_local.process(); //this mantains connections to every local server (preprocessing and postprocessing) and sends a report when an IN pin changes
-          
-          //run as remote server for incoming requests from remote clients (currently mobiles). Also it runs the InformRemote functionality.
-          //remote.process();
-          
-          //run as local server for incoming requests from local clients (currently mobiles)
-          local_server.process();
+
+
+					
       
-          if( toggle_connect_failure_notifier_pin ) {
-            NodeMCU::toggleConnectFailureNotifierPin();
-          } else {
-            NodeMCU::setConnectFailureNotifierPinLow(); //Comment for debugging
-          }    
-          
-        //} //comment for PCF exclusion
-        
-          /* //UNCOMMENT THIS IN CASE OF PCF
-        int pcf_check_interval = 5; //each 5 ms refresh pcf.  
-        for( int i = 0 ; i < floor( delay_per_loop / pcf_check_interval ) ; i++ ) { // 18 loops x 40 ms = 720 ms which is about 750 ms
-          NodeMCU::yieldAndDelay( pcf_check_interval ); //40 ms (instead of 5 ms) is probably noticeable
-          
-          PCF1->getStateFromEEPROM_AndRefresh(0); //I don't care about getting the state from the EEPROM, but refresh is what I care about.
-          */
-      
-          /*This is really needed because I don't know another way to tell if it's really connected or not.
-          * For a critical application, shutting down a pin for 40 ms because the PCF8574A was like shaked is something BAD.
-          * Please note the of the EEPROM were made of inputs (thus 8 input pins) then we may not need the getStateFromEEPROM_AndRefresh(...) method, plus its implementation 
-          * would need t if all the pinsmodification.
-          */
+				if( toggle_connect_failure_notifier_pin ) {
+					NodeMCU::toggleConnectFailureNotifierPin();
+				} else {
+					NodeMCU::setConnectFailureNotifierPinLow(); //Comment for debugging
+				}    
       }
     }
   }
