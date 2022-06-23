@@ -51,18 +51,18 @@ private:
     EEPROM.commit();
   }
 
-	boolean fromEEPROM_connectToRouterOrRestart() {
+	boolean fromEEPROM_connectToRouterOrNotify() {
     /*Here we fetch the network configuration from EEPROM if existing, then we assign them to the corresponding private variables
      * through a special method checkBuffAndAssignConfigVariables that reads well the determinant (the first byte).
      * Next we connect.
      */
     determinant = (byte) EEPROM.read( Start_AP_Index_In_EEPROM );
-    Serial.printf("fromEEPROM_connectToRouterOrRestart()    just after reading first char from EEPROM which is %d\n", determinant);
+    Serial.printf("fromEEPROM_connectToRouterOrNotify()    just after reading first char from EEPROM which is %d\n", determinant);
     
     
 
     //Now we're ready to connect
-    connectToRouterOrRestart();
+    connectToRouterOrNotify();
     return true;
   }
 
@@ -259,19 +259,16 @@ public:
   }  
 
 	void launch() { //this method is called everytime the NodeMCU starts
-    max_counter_to_start_APmode = floor( After_Press_Start_APmode_Timer * 1000 / delay_per_loop );    
+    max_counter_to_start_APmode = floor( After_Press_Start_APmode_Timer * 1000 / delay_per_loop );
     counter_to_start_APmode = max_counter_to_start_APmode;
     /*Now the process of trying to connect to router or entering AP mode, etc.*/
     check_APmode_pin(); 
-    if( !is_APmode_button_pressed ) { /*This check is necessary here; the user wants to change network configuration right after 
-                                       * NodeMCU startup without falling into a restart (i.e. not being able to change network config)*/
-      /*Aside note: in a weird case, it is possible that this block will be bypassed by a user pressing and then the user 
-       * cancels his intention to set network configurations, so what happens then?
-       * It won't be able to connect to router since the connection had never yet begun
-       * (regardless whether the network configuration is good or bad) 
+    if( !is_APmode_button_pressed ) { /*This check is necessary here; the user wants to change network configuration right after NodeMCU startup without falling into a restart (i.e. not being able to change network config)*/
+      /*Aside note : in a weird case, it is possible that this block will be bypassed by a user pressing and then the user cancels his intention to set network configurations, so what happens then?
+       * It won't be able to connect to router since the connection had never yet began (regardless whether the network configuration is good or bad) 
        * and so it will restart.
        */ 
-      if( !fromEEPROM_connectToRouterOrRestart() ) { /*This metod returns true in case of successful connection to router. It returns false in case the info in the network configuration in the EEPROM was not valid in format*/
+      if( !fromEEPROM_connectToRouterOrNotify() ) { /*This metod returns true in case of successful connection to router. It returns false in case the info in the network configuration in the EEPROM was not valid in format*/
         /*If the info in the EEPROM are correct in format but the NodeMCU isn't able to connect then NodeMCU will restart.*/        
         must_APmode_be_activated = true; /*This is a strict lock to never do anything unless the network configuration are set with a good format*/
       }
@@ -303,7 +300,7 @@ public:
     NodeMCU::restartNodeMCU();
   }
 
-	void connectToRouterOrRestart() { //this is ("only" - I believe) called on success of reading the buffer containing the network configuration.
+	void connectToRouterOrNotify() { //this is ("only" - I believe) called on success of reading the buffer containing the network configuration.
     /*The following 2 lines are to set the mac address if the original mac address was considered invalid for static IP allocation by the router.
      * uint8_t mac[6] {0x2C, 0x3A, 0xE8, 0x40,0x31, 0xB6}; //Actually, this is the meant MAC 2C:3A:E8:40:31:BA. ??
      * It is the second nibble that matters being 2, 6, A, or E (really?). But is it the second nibble from last or beginning?? 
@@ -346,15 +343,15 @@ public:
       Serial.println("connected to Router..."); 
       return;
     }
-    Serial.println("Restarting as not being connected..."); 
-    NodeMCU::restartNodeMCU();
+    //Serial.println("Restarting as not being connected..."); 
+    //NodeMCU::restartNodeMCU();
   }
 
   void firstTimeAP_Setup() {
     //setting first-time-things to AP mode
     Serial.println("firstTimeAP_Setup()");      
     resetEEPROM();
-    NodeMCU::setConnectFailureNotifierPinHigh();
+    NodeMCU::setNotifierPinLow();
     //DONE setting first-time-things to AP mode
     runAsAP();     
   }
@@ -371,9 +368,9 @@ public:
     /*when we reach here, then we've got successful info from user so we want to return all back to normal*/
     stopAll_AP_Operations(); /*like closing opened socket with user*/
     writeNetworkConfigVariablesToEEPROM(); /*same for this method*/
-    connectToRouterOrRestart(); /*this method is only called when the user network configuration variables are all set (thus has been accepted)*/    
+    connectToRouterOrNotify(); /*this method is only called when the user network configuration variables are all set (thus has been accepted)*/    
     //now it is connected to router, so setting first-time-things back to normal operation
-    NodeMCU::setConnectFailureNotifierPinLow();
+    NodeMCU::setNotifierPinHigh();
     counter_to_start_APmode = max_counter_to_start_APmode;
     is_APmode_button_pressed = false;
     must_APmode_be_activated = false;

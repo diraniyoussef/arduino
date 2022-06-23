@@ -3,11 +3,11 @@
 
 extern const int max_EEPROM;
 const byte AP_setup_pin = 0; //the built-in flash button on the NodeMCU
-
+extern const int delay_wifiLoss_notificationToggle;
 
 class NodeMCU {
 private:
-	const static byte connect_failure_notifier_pin = 2;
+	const static byte notifier_pin = 2;
 	static void toggle_D_pin_State(int pin) {
     if (digitalRead( pin ) ){
       digitalWrite( pin, LOW );
@@ -17,27 +17,26 @@ private:
   }
 
 public:
+
 	static void setPins() {
 		pinMode(AP_setup_pin, INPUT_PULLUP); //the built-in flash button on the NodeMCU
-		pinMode(connect_failure_notifier_pin, OUTPUT); //the built-in flash button on the NodeMCU
+		pinMode(notifier_pin, OUTPUT); //the built-in flash button on the NodeMCU
 	}
 
-	static void toggleConnectFailureNotifierPin() {
-    toggle_D_pin_State(connect_failure_notifier_pin);
+	static void toggleNotifierPin() {
+    toggle_D_pin_State(notifier_pin);
   }
 
 	static boolean getInPinStateAsConsidered( int pin ) {//I mean by "As Considered" that I may choose to consider the LOW as On state for the info. This is in accordance with PCB design
     return ( !digitalRead( pin ) );
   }
 
-	static void setConnectFailureNotifierPinHigh() {
-    setOutPinStateAsOpposite( connect_failure_notifier_pin, true );
-    //digitalWrite( getRealPinFromD( connect_failure_notifier_pin ), HIGH );
+	static void setNotifierPinHigh() {
+    setOutPinStateAsOpposite( notifier_pin, true );    
   }
 
-  static void setConnectFailureNotifierPinLow() {
-    setOutPinStateAsOpposite( connect_failure_notifier_pin, false );
-    //digitalWrite( getRealPinFromD( connect_failure_notifier_pin ), LOW );
+  static void setNotifierPinLow() {
+    setOutPinStateAsOpposite( notifier_pin, false );
   }
 
 	static void setOutPinStateAsOpposite( int pin , boolean state_bool ) {/*always as opposite*/
@@ -61,22 +60,25 @@ public:
     /* The caller of this method usually directly restart the NodeMCU if this method returned false.
      * In this sense we may say that this method blocks the execution in case it was not connected.
      */
+    /* really_try_to_connect is usually true when AP_op.is_APmode_button_pressed is false. And vice versa.
+     * In case AP_op.is_APmode_button_pressed is true, we don't want to do anything actually, not even we want to delay here in isConnectedToWiFi since check_APmode_pin() has its own counter (which is equivalent usually to 5 seconds of continuous press).
+    */
     int i = 0;    
-    boolean notifier_pin_set_to_high = false;
+    boolean notifier_pin_set_to_low = false;
     while( WiFi.status() != WL_CONNECTED && i < 5 ) { //waiting for 3 seconds. 
       i++;      
-      if (i >= 3) {
-        setConnectFailureNotifierPinHigh(); //Comment for debugging
-        main_oper_vars_need_to_be_reset = true;
-        notifier_pin_set_to_high = true;
-      }
       if( really_try_to_connect ) {
-        delay(750); //PLEASE DON'T WAIT LESS THAN THIS. LONG WAITING TIME TO CONNECT IS NECESSARY. 
+        if (i >= 3) {
+          setNotifierPinLow(); //Comment for debugging
+          //main_oper_vars_need_to_be_reset = true;
+          notifier_pin_set_to_low = true;
+        }        
+        delay(delay_wifiLoss_notificationToggle); //PLEASE DON'T WAIT LESS THAN THIS. LONG WAITING TIME TO CONNECT IS NECESSARY. 
       }
       Serial.print(".");
     }
-    if( notifier_pin_set_to_high ) { //needed
-      setConnectFailureNotifierPinLow(); //Comment for debugging
+    if( notifier_pin_set_to_low ) { //needed
+      setNotifierPinHigh();
     }
 
     if (WiFi.status()!= WL_CONNECTED) {
@@ -86,6 +88,8 @@ public:
       return(true);
     }
   }
+
+  
 };
 
 class General{
