@@ -19,10 +19,8 @@ WiFiServer AP_server(3551); /*interesting why this cannot be a private member*/
  * 1 -> Electrotel_Dirani -> trailor
  * At maximum the size of the whole buffer is 1 + 32 + 1 + 64 + 2 + 4 + 2 + 4 + 2 + 4 + 1 + 12 + 1 = 130 bytes.
  */
-const byte Max_AP_Buffer_Size = 1 + SSID_Buff_Size + 1 + Password_Buff_Size + 2 + Max_IP_Buff_Size + 2 + Max_IP_Buff_Size + 2 + Max_IP_Buff_Size + 1 +
-                              MAC_Buff_Size + 1; /*If more than a 255 (because in many places I used 'byte' and not 'int' to refer to the buffer) 
-                                                  * which is the byte size then something must be changed in the code below!*/
-                              /*should'd been public inside the class*/
+const byte Max_AP_Buffer_Size = 1 + SSID_Buff_Size + 1 + Password_Buff_Size + 2 + Max_IP_Buff_Size + 2 + Max_IP_Buff_Size + 2 + Max_IP_Buff_Size + 1 + MAC_Buff_Size + 1; /*If more than a 255 (because in many places I used 'byte' and not 'int' to refer to the buffer) which is the byte size then something must be changed in the code below !*/
+  /*should'd been public inside the class*/
 
 const int max_EEPROM = Start_AP_Index_In_EEPROM + Max_AP_Buffer_Size;
 const char trailor = 127; //should'd been public inside the class. 
@@ -267,9 +265,9 @@ public:
       /*Aside note : in a weird case, it is possible that this block will be bypassed by a user pressing and then the user cancels his intention to set network configurations, so what happens then?
        * It won't be able to connect to router since the connection had never yet began (regardless whether the network configuration is good or bad) 
        * and so it will restart.
-       */ 
-      if( !fromEEPROM_connectToRouterOrNotify() ) { /*This metod returns true in case of successful connection to router. It returns false in case the info in the network configuration in the EEPROM was not valid in format*/
-        /*If the info in the EEPROM are correct in format but the NodeMCU isn't able to connect then NodeMCU will restart.*/        
+       */
+      if( !fromEEPROM_connectToRouterOrNotify() ) { /*This metod returns false in case the info in the network configuration in the EEPROM was not valid in format, otherwise it returns true*/
+        /*If the info in the EEPROM are correct in format but the NodeMCU isn't able to connect then NodeMCU will restart.<-----CANCELLED*/
         must_APmode_be_activated = true; /*This is a strict lock to never do anything unless the network configuration are set with a good format*/
       }
     }
