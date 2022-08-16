@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>AP mode- Home Load Balancer</title>
+		<link rel="icon" href="data:,">
+		<style> html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}
+					.button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;
+								text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer; float:none;}
+					.button2 {background-color: #77878A;}
+					label {clear: both; width: 10ch;}
+					input {width: 15ch;}
+					div {margin-bottom: 10px;}
+					.entryblock {width: 25ch; height: 7ch; margin:auto;}
+					.entry {float: right;}
+		</style>
+	</head>
+
+	<body>
+		<section>
+			<h1>
+				This is "Home Load Balancer" settings.				
+			</h1>
+		</section>
+		<section>
+			<p>This module will connect to your router.
+				Please fill the router's configuration :
+			</p>
+			<div class="entryblock">
+				<div class="entry">
+					<label>router SSID*</label>
+					<input type="text" name="ssid" maxlength="30">			
+				</div>								
+				<div class="entry">
+					<label>password   </label>
+					<input type="password" name="password" maxlength="30">			
+				</div>
+			</div>
+			<p>
+				<a href="/submit">
+					<button class="button">
+						Apply
+					</button>
+				</a>
+			</p>			
+		</section>						
+	</body>
+</html>
+
