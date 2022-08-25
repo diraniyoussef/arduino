@@ -6,6 +6,7 @@
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h> 
+#include "stringoper.h"
 
 // Replace with your network credentials
 const char* ssid     = "TP-LINK_2B5E";
@@ -15,7 +16,7 @@ const char* password = "87654321";
 WiFiServer server(80);
 
 // Variable to store the HTTP request
-String header;
+Buff header;
 
 // Auxiliar variables to store the current output state
 String output5State = "off";
@@ -73,7 +74,8 @@ void loop() {
 
   if (client) {                             // If a new client connects,
     Serial.println("New Client.");          // print a message out in the serial port
-    String currentLine = "";                // make a String to hold incoming data from the client
+    //String currentLine = "";                // make a String to hold incoming data from the client
+    bool two_backslash_n = true;  //this is a fit succinct alternative to currentLine
     currentTime = millis();
     previousTime = currentTime;
     while (client.connected() && currentTime - previousTime <= timeoutTime) { // loop while the client's connected
@@ -82,12 +84,13 @@ void loop() {
         char c = client.read();             // read a byte, then
         //Serial.println("a char is available");
         Serial.write(c);                    // print it out the serial monitor
-        header += c;
+        header.add(c);
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
           // that's the end of the client HTTP request, so send a response:
           Serial.println("char is \\n");
-          if (currentLine.length() == 0) {
+          //if (currentLine.length() == 0) {
+          if( two_backslash_n ) {
             Serial.println("sending something to browser");
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
@@ -97,19 +100,19 @@ void loop() {
             client.println();
             
             // turns the GPIOs on and off
-            if (header.indexOf("GET /5/on") >= 0) {
+            if (header.has("GET /5/on") >= 0) {
               Serial.println("GPIO 5 on");
               output5State = "on";
               digitalWrite(output5, HIGH);
-            } else if (header.indexOf("GET /5/off") >= 0) {
+            } else if (header.has("GET /5/off") >= 0) {
               Serial.println("GPIO 5 off");
               output5State = "off";
               digitalWrite(output5, LOW);
-            } else if (header.indexOf("GET /4/on") >= 0) {
+            } else if (header.has("GET /4/on") >= 0) {
               Serial.println("GPIO 4 on");
               output4State = "on";
               digitalWrite(output4, HIGH);
-            } else if (header.indexOf("GET /4/off") >= 0) {
+            } else if (header.has("GET /4/off") >= 0) {
               Serial.println("GPIO 4 off");
               output4State = "off";
               digitalWrite(output4, LOW);
@@ -131,12 +134,12 @@ void loop() {
             
             // Display current state, and ON/OFF buttons for GPIO 5  
             client.println("<p>GPIO 5 - State " + output5State + "</p>");
-            // If the output5State is off, it displays the ON button       
+            // If the output5State is off, it displays the ON button
             if (output5State=="off") {
               client.println("<p><a href=\"/5/on\"><button class=\"button\">ON</button></a></p>");
             } else {
               client.println("<p><a href=\"/5/off\"><button class=\"button button2\">OFF</button></a></p>");
-            } 
+            }
                
             // Display current state, and ON/OFF buttons for GPIO 4  
             client.println("<p>GPIO 4 - State " + output4State + "</p>");
@@ -154,18 +157,20 @@ void loop() {
             break;
           } else { // if you got a newline, then clear currentLine
             Serial.println("making currentLine empty");
-            currentLine = "";
+            //currentLine = "";
+            two_backslash_n = true; //actually this is the first \n, not the second.
           }
         } else if (c != '\r') {  // if you got anything else but a carriage return character,
           //Serial.println("adding char to currentLine");
-          currentLine += c;      // add it to the end of the currentLine
+          //currentLine += c;      // add it to the end of the currentLine
+          two_backslash_n = false;
         } else {
           Serial.println("char is \\r");
         }
       }
     }
     // Clear the header variable
-    header = "";
+    header.reset();
     // Close the connection
     client.stop();
     Serial.println("Client disconnected.");
