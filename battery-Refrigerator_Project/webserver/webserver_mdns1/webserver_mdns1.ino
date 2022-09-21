@@ -54,4 +54,5 @@ void setup()
 void loop()
 {
   my_server.loop();
+  delay(40);
 }
