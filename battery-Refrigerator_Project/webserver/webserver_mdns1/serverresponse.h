@@ -1,4 +1,6 @@
 #include "stringoper.h"
+#include <ESP8266WiFi.h> //since this is already included in the main file there'se no need to include it here but Arduino extension in VSCode is not smart enough not to consider omitting it here an error.
+#include <ESP8266mDNS.h> //same here
 
 class ServerResponse
 {
@@ -46,6 +48,7 @@ public:
 			while (client.connected() && currentTime - previousTime <= timeoutTime)
 			{ // loop while the client's connected
 				currentTime = millis();
+				//delayMicroseconds(50);
 				if (client.available())
 				{													// if there's bytes to read from the client
 					char c = client.read(); // read a byte, then
@@ -60,6 +63,7 @@ public:
 						// if (currentLine.length() == 0) {
 						if (two_backslash_n)
 						{
+							Serial.println("responding, acting and showing");
 							respondOk();
 							action();
 							displayPage();
@@ -77,7 +81,7 @@ public:
 					}
 					else if (c != '\r')
 					{ // if you got anything else but a carriage return character,
-						// Serial.println("adding char to currentLine");
+						Serial.println("adding char to currentLine");
 						// currentLine += c;      // add it to the end of the currentLine
 						two_backslash_n = false;
 					}
@@ -98,7 +102,7 @@ public:
 
 	void respondOk()
 	{
-		Serial.println("sending something to browser");
+		Serial.println("responding ok");
 		// HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
 		// and a content-type so the client knows what's coming, then a blank line:
 		client.println("HTTP/1.1 200 OK");

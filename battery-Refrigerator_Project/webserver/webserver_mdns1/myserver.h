@@ -9,25 +9,25 @@ class MyServer:public ServerResponse
 {
 	void action() {
 		// turns the GPIOs on and off
-		if (header.has("GET /5/on") >= 0)
+		if (header.has("GET /5/on"))
 		{
 			Serial.println("GPIO 5 on");
 			output5State = "on";
 			digitalWrite(output5, HIGH);
 		}
-		else if (header.has("GET /5/off") >= 0)
+		else if (header.has("GET /5/off"))
 		{
 			Serial.println("GPIO 5 off");
 			output5State = "off";
 			digitalWrite(output5, LOW);
 		}
-		else if (header.has("GET /4/on") >= 0)
+		else if (header.has("GET /4/on"))
 		{
 			Serial.println("GPIO 4 on");
 			output4State = "on";
 			digitalWrite(output4, HIGH);
 		}
-		else if (header.has("GET /4/off") >= 0)
+		else if (header.has("GET /4/off"))
 		{
 			Serial.println("GPIO 4 off");
 			output4State = "off";

@@ -1,7 +1,7 @@
 class Buff {
   private:
 
-	const static unsigned int MAX_LEN = 40;
+	const static unsigned int MAX_LEN = 500; //lowering this value while accessing will cause continuous reset WatchDog Reset
 	unsigned int len = 0;		
 	
   public:
@@ -13,7 +13,7 @@ class Buff {
 	}
 
 	bool add(char c) {
-		if( len < MAX_LEN ) {
+		if( len < MAX_LEN - 1 ) {
 			buff[len] = c;
 			len += 1;
 			buff[len] = '\0';
