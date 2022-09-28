@@ -8,17 +8,16 @@ class ServerResponse
 	
 private:	
 	virtual void handleRoot() = 0 ;              // function prototypes for HTTP handlers
-	//void handleApplyWifi();
 	virtual void handleNotFound() = 0;
-
-
+	virtual void setAdditionalHandlers() = 0; //if there are no additional handlers the derived class can simply make it an empty function
 
 public:
 	ESP8266WebServer* server = new ESP8266WebServer(80);
-	void begin(char* domain_name);
-	void loop();
-	
-	char* logo_settings;
+
+	~ServerResponse()
+	{
+		delete (server);
+	}
 
 	void begin(char* domain_name)
 	{
@@ -28,23 +27,23 @@ public:
 		}
 		Serial.println("mDNS responder started");
 
+		// Call the 'handleRoot' function when a client requests URI "/"
+		server->on("/", HTTP_GET, [this]() { this->handleRoot(); });  /*[this]() { this->handleRoot(); } is because the "on" method takes std::function<void ()> but handleRoot is not a function, rather it's a method.*/
+ 		Serial.println("handleRoot is set");
+		//setting additional handlers
+		setAdditionalHandlers();
 
-		server->on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"  	
-  	server->onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+		// When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"  	
+  	server->onNotFound([this]() { this->handleNotFound(); });           
+		Serial.println("handleNotFound is set");
 		
-		
-	}
-
-	~ServerResponse()
-	{
-		delete (server);
+		server->begin();
 	}
 
 	void loop()
 	{
 	  MDNS.update();
-  	server->handleClient();                     // Listen for HTTP requests from clients
-	
+  	server->handleClient();                     // Listen for HTTP requests from clients	
 	}
 
 };

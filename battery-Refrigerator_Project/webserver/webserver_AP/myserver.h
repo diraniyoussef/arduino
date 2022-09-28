@@ -1,14 +1,18 @@
 #include "serverresponse.h"
+#include "stringoper.h"
 
 class MyServer:public ServerResponse
 {
 private:
-	//ESP8266WebServer* server = ServerResponse::server;
-  const char* logo_settings = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAABL0lEQVQ4jZXTMUpDQRQF0JN8UTAKEdE6BCKIihJwARaCFha2rkJXYKWF9omFREF7g4JmAboUu2zARi3+ixm+icELw7w/c++8d/+84W/MxvgX1lGP+AXPEa9gtUieKnzP4Qp9HOMdGWq4wDJ28DEq83zMd9hCC01so41N3Ba4P1jDa4gfo5IiqnjCfXDX0s06upF5ID7ETYyDxOJmcOsKqEXZA/EpSijjHPux1wruDyro4To8i6ylhJOhE3EzuD1UyrH4GaQsEaUHwFdyWBaaXxbaER/gLCFfYnecBfIm6cp/UDXW9qLsTiJewAYe0GDYSBmWcIJFHIXHXpKkKr/mvryhUrtgJua7qKTYSBuGjTRdFA8wJ2+Sbvi8lt9ILdbekkRjMe4xNYx4TJMw8Tl/A1fLMmj4BEFEAAAAAElFTkSuQmCC";
+	using ServerResponse::server;
 
-  void handleRoot() override
+  const char* logo_settings = "'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAABL0lEQVQ4jZXTMUpDQRQF0JN8UTAKEdE6BCKIihJwARaCFha2rkJXYKWF9omFREF7g4JmAboUu2zARi3+ixm+icELw7w/c++8d/+84W/MxvgX1lGP+AXPEa9gtUieKnzP4Qp9HOMdGWq4wDJ28DEq83zMd9hCC01so41N3Ba4P1jDa4gfo5IiqnjCfXDX0s06upF5ID7ETYyDxOJmcOsKqEXZA/EpSijjHPux1wruDyro4To8i6ylhJOhE3EzuD1UyrH4GaQsEaUHwFdyWBaaXxbaER/gLCFfYnecBfIm6cp/UDXW9qLsTiJewAYe0GDYSBmWcIJFHIXHXpKkKr/mvryhUrtgJua7qKTYSBuGjTRdFA8wJ2+Sbvi8lt9ILdbekkRjMe4xNYx4TJMw8Tl/A1fLMmj4BEFEAAAAAElFTkSuQmCC'";
+  //const char* logo_settings = "'data:,'";
+
+  void handleRoot() 
   {                          // When URI / is requested, send a web page with a button to toggle the LED
-    ServerResponse::server->send(200, "text/html", strcpy(strcpy(
+  Serial.println("handleRoot is called");
+    ServerResponse::server->send(200, "text/html", concat(concat(
       "<head>"
         "<meta name='viewport' content='width=device-width, initial-scale=1'>"
         "<title>AP mode- Home Load Balancer</title>"
@@ -51,10 +55,11 @@ private:
       "</body>"
       )
     );
-  }
+  } //don't worry about freeing the memory resulting from concat. It's atomatic when we get out of scope I guess.
 
   void handleApplyWifi()
   {                         // If a POST request is made to URI /login
+  Serial.println("handleApplyWifi is called");
     //the following if makes sure user has entered something
     if( ! ServerResponse::server->hasArg("ssid") || ! ServerResponse::server->hasArg("password") 
         || ServerResponse::server->arg("ssid") == NULL || ServerResponse::server->arg("password") == NULL) { // If the POST request doesn't have username and password data
@@ -68,7 +73,7 @@ private:
     Serial.println(ssid);
     Serial.print("password : ");
     Serial.println(password);
-    ServerResponse::server->send(200, "text/html", strcpy(strcpy(
+    ServerResponse::server->send(200, "text/html", concat(concat(
       "<head>"
         "<meta name='viewport' content='width=device-width, initial-scale=1'>"
         "<title>AP mode- Home Load Balancer</title>"
@@ -100,19 +105,16 @@ private:
     */
   }
 
-  void handleNotFound() override
+  void handleNotFound()
   {
+    Serial.println("handleNotFound is called");
     ServerResponse::server->send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
   }
 
-
-public:
-	void begin(char* domain_name)
-	{
-		ServerResponse::begin(domain_name);
-		//ServerResponse::server->on("/applywifi", HTTP_POST, handleApplyWifi); // Call the 'handleLogin' function when a POST request is made to URI "/login"
-    ServerResponse::server->begin();
-    Serial.println("HTTP server started");
-	}
+  void setAdditionalHandlers()
+  {
+    ServerResponse::server->on("/applywifi", HTTP_POST, [this]() { this->handleApplyWifi(); }); // Call the 'handleApplyWifi' function when a POST request is made to URI "/applywifi"
+    Serial.println("handleApplyWifi is set");
+  }
 
 };

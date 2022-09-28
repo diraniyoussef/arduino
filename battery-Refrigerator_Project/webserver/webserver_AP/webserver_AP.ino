@@ -1,3 +1,5 @@
+//https://tttapa.github.io/ESP8266/Chap10%20-%20Simple%20Web%20Server.html
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include "myserver.h"
@@ -29,22 +31,10 @@ void setup(){
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP());            // Send the IP address of the ESP8266 to the computer
 
-  if (MDNS.begin("refrigerator")) {              // Start the mDNS responder for esp8266.local
-    Serial.println("mDNS responder started");
-  } else {
-    Serial.println("Error setting up MDNS responder!");
-  }
-/*
-  server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
-  server.on("/applywifi", HTTP_POST, handleApplyWifi); // Call the 'handleLogin' function when a POST request is made to URI "/login"
-  server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
-*/
   myserver.begin("refrigerator");                            // Actually start the server
 
-  
 }
 
 void loop(){
-  
+  myserver.loop();  
 }
-
