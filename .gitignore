@@ -1,3 +1,5 @@
 .vscode
 AbbasFarhat/.vscode
-libraries
+libraries/*
+!libraries/WiFiManager-master
+!libraries/SimpleTimer-master
