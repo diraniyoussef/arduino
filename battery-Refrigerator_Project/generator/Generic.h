@@ -30,6 +30,8 @@ public:
   {
     pinMode(AP_setup_pin, INPUT_PULLUP); // the built-in flash button on the NodeMCU
     pinMode(notifier_pin, OUTPUT);       // the built-in flash button on the NodeMCU
+    pinMode(D5, OUTPUT);
+    pinMode(D6, OUTPUT);
   }
 
   static void toggleNotifierPin()

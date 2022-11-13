@@ -1,12 +1,13 @@
 #include "serverresponse.h"
 #include "stringoper.h"
+#include "Generic.h"
 
 class MyServer:public ServerResponse
 {
 private:
 	using ServerResponse::server;
 
-  const char* logo_settings = "'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAABL0lEQVQ4jZXTMUpDQRQF0JN8UTAKEdE6BCKIihJwARaCFha2rkJXYKWF9omFREF7g4JmAboUu2zARi3+ixm+icELw7w/c++8d/+84W/MxvgX1lGP+AXPEa9gtUieKnzP4Qp9HOMdGWq4wDJ28DEq83zMd9hCC01so41N3Ba4P1jDa4gfo5IiqnjCfXDX0s06upF5ID7ETYyDxOJmcOsKqEXZA/EpSijjHPux1wruDyro4To8i6ylhJOhE3EzuD1UyrH4GaQsEaUHwFdyWBaaXxbaER/gLCFfYnecBfIm6cp/UDXW9qLsTiJewAYe0GDYSBmWcIJFHIXHXpKkKr/mvryhUrtgJua7qKTYSBuGjTRdFA8wJ2+Sbvi8lt9ILdbekkRjMe4xNYx4TJMw8Tl/A1fLMmj4BEFEAAAAAElFTkSuQmCC'"; //iconfinder.com
+  const char* logo_settings = "'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABOklEQVQ4T83TvS9DURzG8TZ0kDQd+APEIii6GMRlMDGrhMUkEi9pUmKxEFYSbwMSk0EYbBaLdlAxkJBovAyNf0BiQYKE75M8/QdcTdzk0ye9ued3fvecc6ORkFc05PiICnTjAl8u1kA24hLPvldHduAJD76nsZ36+XaBVbIXY6jy4AU/vETW+tktMocsAhVoxTwGUMIczlxohoxhHZvowiKacYJZFdDgDbziE0PQa+3i1h00keM4xwGqUaMuyh1k+BP3bIfuYJRsh17xHtvuYJjUer1jpSId7FM5jwmk3MEdqXXowcj/60A7sINHr+4k2QJt0xF0pdEHbfMaPlCPKS1iETp9x9Bp025cQ4eq4AIBeQqtyRtu0K9JVUAGof3XMV3GC5KYhg6SurxCAjqBbZ5w708+Jnf5u/gBUN9axHLJtkwAAAAASUVORK5CYII='";
   //const char* logo_settings = "'data:,'";
 
   void handleRoot() 
@@ -113,7 +114,7 @@ private:
 
   void setAdditionalHandlers()
   {
-    ServerResponse::server->on("/applywifi", HTTP_POST, [this]() { this->handleApplyWifi(); }); // Call the 'handleApplyWifi' function when a POST request is made to URI "/applywifi"
+    ServerResponse::server->on("/submit", HTTP_POST, [this]() { this->handleApplyWifi(); }); // Call the 'handleApplyWifi' function when a POST request is made to URI "/applywifi"
     Serial.println("handleApplyWifi is set");
   }
 

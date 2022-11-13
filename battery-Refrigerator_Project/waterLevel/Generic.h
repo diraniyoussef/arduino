@@ -1,5 +1,6 @@
+#pragma once
 #include <ESP8266WiFi.h>
-//#include <EEPROM.h>
+
 
 //extern const int max_EEPROM;
 
